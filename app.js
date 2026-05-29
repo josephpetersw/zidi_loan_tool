@@ -70,7 +70,7 @@ function calculate() {
   const appFee    = financed * appFeeRate;
   const serviceFee= financed * serviceFeeRate;
   const licenseFee= financed * licenseFeeRate;
-  const excise    = financed * exciseRate;
+  const excise    = interest * exciseRate;
   const vat       = financed * vatRate;
   const fees      = appFee + serviceFee + licenseFee + excise + vat + agentComm;
 
