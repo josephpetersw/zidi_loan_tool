@@ -186,10 +186,27 @@
             <p>Enter loan details and click<br><strong>Calculate Loan</strong> to see the full breakdown.</p>
           </div>
         </div>
+
+        <button class="btn-profit" onclick="openModal()" id="profitBtn" style="margin-top: 16px; width: 100%; display: none;" aria-label="Open profit breakdown">
+          <i class="fa-solid fa-chart-line"></i> View Profit Breakdown
+        </button>
       </div>
 
     </div><!-- /.grid -->
   </div><!-- /.container -->
+
+  <!-- ─── Modal ─── -->
+  <div id="profitModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>💰 Profit Analysis Breakdown</h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="profitModalBody">
+        <!-- populated by JS -->
+      </div>
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>

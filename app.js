@@ -20,6 +20,23 @@ function setMetric(id, value) {
   }
 }
 
+// ─── Modal Open/Close Controls ──────────────────────────────────────────────
+function openModal() {
+  document.getElementById('profitModal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('profitModal').classList.remove('show');
+}
+
+// Close modal if clicking outside the modal content box
+window.addEventListener('click', (e) => {
+  const modal = document.getElementById('profitModal');
+  if (e.target === modal) {
+    closeModal();
+  }
+});
+
 // ─── Main calculate function ──────────────────────────────────────────────────
 function calculate() {
   const amount       = Number(document.getElementById('amount').value       || 0);
@@ -66,7 +83,7 @@ function calculate() {
   const financed  = amount - deposit;
   const interest  = financed * rate * days;
 
-  // Fees & taxes (Rates are based on Financed Principal)
+  // Fees & taxes (Rates are based on Financed Principal, Excise is on Interest)
   const appFee    = financed * appFeeRate;
   const serviceFee= financed * serviceFeeRate;
   const licenseFee= financed * licenseFeeRate;
@@ -84,6 +101,14 @@ function calculate() {
   setMetric('fees',      fees);
   setMetric('repayment', repayment);
   setMetric('daily',     daily);
+
+  // Show or hide profit breakdown button depending on values
+  const profitBtn = document.getElementById('profitBtn');
+  if (financed > 0) {
+    profitBtn.style.display = 'flex';
+  } else {
+    profitBtn.style.display = 'none';
+  }
 
   // Build breakdown panel
   const bd = document.getElementById('breakdown');
@@ -118,6 +143,66 @@ function calculate() {
     <div class="breakdown-total">
       <span class="br-label">Total Charges</span>
       <span class="br-value">${fmt(fees)}</span>
+    </div>
+  `;
+
+  // Build Profit Modal breakdown content
+  // Revenue (Inflows) = Interest + Application + Service + License fees
+  const revenue = interest + appFee + serviceFee + licenseFee;
+  // Deductions/Expenses (Outflows) = Excise Duty + VAT + Agent Commission
+  const expenses = excise + vat + agentComm;
+  const netProfit = revenue - expenses;
+  
+  const profitModalBody = document.getElementById('profitModalBody');
+  profitModalBody.innerHTML = `
+    <div class="modal-section-title">📈 Revenue (Inflows)</div>
+    <div class="modal-row inflow">
+      <span class="label">Interest Income</span>
+      <span class="val">+ ${fmt(interest)}</span>
+    </div>
+    <div class="modal-row inflow">
+      <span class="label">Application Fee</span>
+      <span class="val">+ ${appFeeEnabled ? fmt(appFee) : 'KES 0.00 (Disabled)'}</span>
+    </div>
+    <div class="modal-row inflow">
+      <span class="label">Service Fee</span>
+      <span class="val">+ ${serviceFeeEnabled ? fmt(serviceFee) : 'KES 0.00 (Disabled)'}</span>
+    </div>
+    <div class="modal-row inflow">
+      <span class="label">License Fee</span>
+      <span class="val">+ ${licenseFeeEnabled ? fmt(licenseFee) : 'KES 0.00 (Disabled)'}</span>
+    </div>
+    <div class="modal-row" style="border-top: 1px solid var(--border-light); font-weight: 700; padding-top: 8px; margin-top: 4px;">
+      <span class="label" style="color: var(--text);">Total Revenue</span>
+      <span class="val" style="color: #10b981;">${fmt(revenue)}</span>
+    </div>
+
+    <div class="modal-section-title" style="margin-top: 18px;">💸 Expenses & Taxes (Outflows)</div>
+    <div class="modal-row outflow">
+      <span class="label">Excise Duty (Tax)</span>
+      <span class="val">- ${exciseEnabled ? fmt(excise) : 'KES 0.00 (Disabled)'}</span>
+    </div>
+    <div class="modal-row outflow">
+      <span class="label">VAT (Tax)</span>
+      <span class="val">- ${vatEnabled ? fmt(vat) : 'KES 0.00 (Disabled)'}</span>
+    </div>
+    <div class="modal-row outflow">
+      <span class="label">Agent Commission</span>
+      <span class="val">- ${agentCommEnabled ? fmt(agentComm) : 'KES 0.00 (Disabled)'}</span>
+    </div>
+    <div class="modal-row" style="border-top: 1px solid var(--border-light); font-weight: 700; padding-top: 8px; margin-top: 4px;">
+      <span class="label" style="color: var(--text);">Total Deductions</span>
+      <span class="val" style="color: #ef4444;">${fmt(expenses)}</span>
+    </div>
+
+    <div class="modal-profit-summary" style="margin-top: 20px; padding-top: 15px; border-top: 1.5px solid var(--border-color);">
+      <div class="profit-value-large">
+        <span style="color: var(--text);">Net Profit Remaining</span>
+        <span style="color: var(--primary); font-size: 1.3rem;">${fmt(netProfit)}</span>
+      </div>
+      <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 6px; text-align: right;">
+        Profit margin: <b>${revenue > 0 ? ((netProfit / revenue) * 100).toFixed(1) : 0}%</b>
+      </div>
     </div>
   `;
 }

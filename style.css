@@ -168,7 +168,7 @@ body {
   background: var(--bg-input);
   border: 1px solid var(--border-color);
   border-radius: 6px;
-  padding: 11px 52px 11px 34px; /* Space for prefix/suffix to prevent overlaps */
+  padding: 11px 52px 11px 34px;
   font-size: 0.95rem; font-weight: 600;
   color: var(--text);
   font-family: 'Nunito', sans-serif;
@@ -191,7 +191,7 @@ body {
   background: var(--bg-input);
   border: 1px solid var(--border-color);
   border-radius: 6px;
-  padding: 11px 36px 11px 34px; /* Space for calendar icon and chevron arrow */
+  padding: 11px 36px 11px 34px;
   font-size: 0.95rem; font-weight: 600;
   color: var(--text);
   font-family: 'Nunito', sans-serif;
@@ -402,6 +402,138 @@ input:disabled {
   100% { opacity: 1; }
 }
 .flash { animation: valueFlash 0.3s ease; }
+
+/* ─── Modal Styles ─── */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 0, 43, 0.75);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease-in-out;
+}
+.modal.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+.modal-content {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-r);
+  width: 90%;
+  max-width: 480px;
+  box-shadow: var(--shadow);
+  transform: scale(0.92);
+  transition: transform 0.2s ease-in-out;
+  overflow: hidden;
+}
+.modal.show .modal-content {
+  transform: scale(1);
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-light);
+}
+.modal-header h3 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  cursor: pointer;
+  line-height: 1;
+  transition: color var(--trans);
+}
+.modal-close:hover {
+  color: var(--primary);
+}
+.modal-body {
+  padding: 20px;
+}
+
+/* Modal row styles */
+.modal-section-title {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 12px 0 8px;
+}
+.modal-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88rem;
+  padding: 6px 0;
+  border-bottom: 1px dashed var(--border-light);
+}
+.modal-row:last-child {
+  border-bottom: none;
+}
+.modal-row .label {
+  color: var(--text-muted);
+}
+.modal-row .val {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.modal-row.inflow .val {
+  color: #10b981; /* Green for inflows */
+}
+.modal-row.outflow .val {
+  color: #ef4444; /* Red for outflows */
+}
+.modal-profit-summary {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1.5px solid var(--border-color);
+}
+.profit-value-large {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+/* ─── profit button ─── */
+.btn-profit {
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--highlight-bg);
+  color: var(--primary);
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--trans), border-color var(--trans);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-profit:hover {
+  background: var(--bg-input);
+  border-color: var(--primary);
+}
 
 /* ─── responsive ─── */
 @media (max-width: 860px) {
