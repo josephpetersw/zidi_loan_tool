@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Professional Loan Calculator — compute deposits, repayments, daily installments, fees and taxes instantly.">
+  <title>Advanced Loan Calculator</title>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ─── Header ─── -->
+  <header class="header">
+    <div class="badge"><i class="fa-solid fa-calculator"></i> KES Loan Planner</div>
+    <h1>Advanced Loan Calculator</h1>
+    <p>Configure plan settings, fees &amp; taxes — instantly compute deposit, repayment and daily installment.</p>
+  </header>
+
+  <!-- ─── Two-column grid ─── -->
+  <div class="grid">
+
+    <!-- ════ Left card: Settings ════ -->
+    <div class="card">
+      <h2 class="section-title">
+        <i class="fa-solid fa-sliders"></i>
+        Plan Settings
+      </h2>
+
+      <div class="form-row">
+        <div class="field">
+          <label for="amount">Loan Amount</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-wallet input-icon"></i>
+            <input id="amount" type="number" placeholder="100,000" min="0" step="1000" oninput="calculate()">
+            <span class="input-suffix">KES</span>
+          </div>
+        </div>
+        <div class="field">
+          <label for="days">Duration</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-calendar-days input-icon"></i>
+            <input id="days" type="number" value="365" min="1" step="1" oninput="calculate()">
+            <span class="input-suffix">days</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label for="down">Down Payment</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-hand-holding-dollar input-icon"></i>
+            <input id="down" type="number" value="27" min="0" max="100" step="0.01" oninput="calculate()">
+            <span class="input-suffix">%</span>
+          </div>
+        </div>
+        <div class="field">
+          <label for="dailyInterest">Daily Interest</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-percent input-icon"></i>
+            <input id="dailyInterest" type="number" value="0.30" min="0" step="0.01" oninput="calculate()">
+            <span class="input-suffix">%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fees table -->
+      <p class="fees-title">Fees &amp; Taxes</p>
+      <table class="fees-table" aria-label="Fees and taxes configuration">
+        <thead>
+          <tr>
+            <th class="col-check">Use</th>
+            <th>Fee</th>
+            <th>Rate&nbsp;%</th>
+            <th>Basis</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="col-check"><input type="checkbox" id="appFeeEnabled" checked onclick="calculate()" aria-label="Enable App Fee"></td>
+            <td>App Fee</td>
+            <td><input id="appFee" type="number" value="1" min="0" step="0.01" oninput="calculate()" aria-label="App fee percentage"></td>
+            <td><span class="basis-tag">Principal</span></td>
+          </tr>
+          <tr>
+            <td class="col-check"><input type="checkbox" id="serviceFeeEnabled" checked onclick="calculate()" aria-label="Enable Service Fee"></td>
+            <td>Service Fee</td>
+            <td><input id="serviceFee" type="number" value="30" min="0" step="0.01" oninput="calculate()" aria-label="Service fee percentage"></td>
+            <td><span class="basis-tag">Principal</span></td>
+          </tr>
+          <tr>
+            <td class="col-check"><input type="checkbox" id="exciseEnabled" checked onclick="calculate()" aria-label="Enable Excise Duty"></td>
+            <td>Excise Duty</td>
+            <td><input id="excise" type="number" value="20" min="0" step="0.01" oninput="calculate()" aria-label="Excise duty percentage"></td>
+            <td><span class="basis-tag">Interest</span></td>
+          </tr>
+          <tr>
+            <td class="col-check"><input type="checkbox" id="vatEnabled" checked onclick="calculate()" aria-label="Enable VAT"></td>
+            <td>VAT</td>
+            <td><input id="vat" type="number" value="16" min="0" step="0.01" oninput="calculate()" aria-label="VAT percentage"></td>
+            <td><span class="basis-tag">Interest</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <button class="btn-calc" onclick="calculate()" id="calcBtn" aria-label="Calculate loan">
+        <i class="fa-solid fa-calculator"></i> Calculate Loan
+      </button>
+    </div>
+
+    <!-- ════ Right card: Results ════ -->
+    <div class="card">
+      <h2 class="section-title">
+        <i class="fa-solid fa-chart-simple"></i>
+        Results
+      </h2>
+
+      <div class="results-grid">
+        <div class="metric">
+          <div class="metric-label">Deposit</div>
+          <div class="metric-value" id="deposit">KES 0.00</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Financed Amount</div>
+          <div class="metric-value" id="financed">KES 0.00</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Interest</div>
+          <div class="metric-value" id="interest">KES 0.00</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Total Fees</div>
+          <div class="metric-value" id="fees">KES 0.00</div>
+        </div>
+        <div class="metric highlight">
+          <div class="metric-label">Total Repayment</div>
+          <div class="metric-value" id="repayment">KES 0.00</div>
+        </div>
+        <div class="metric highlight">
+          <div class="metric-label">Daily Payment</div>
+          <div class="metric-value" id="daily">KES 0.00</div>
+        </div>
+      </div>
+
+      <!-- Breakdown panel -->
+      <div class="breakdown" id="breakdown">
+        <div class="empty-state">
+          <div class="es-icon"><i class="fa-solid fa-list-check"></i></div>
+          <p>Enter loan details and click<br><strong>Calculate Loan</strong> to see the full breakdown.</p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.grid -->
+</div><!-- /.container -->
+
+<script src="app.js"></script>
+</body>
+</html>

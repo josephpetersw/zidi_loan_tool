@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Professional Loan Calculator</title>
+<style>
+:root{
+--bg:#f4f7fb;--card:#ffffff;--accent:#2563eb;--text:#1f2937;--muted:#6b7280;
+}
+*{box-sizing:border-box}
+body{
+margin:0;padding:24px;font-family:Inter,Arial,sans-serif;
+background:linear-gradient(135deg,#eef4ff,#f8fafc);
+color:var(--text);
+}
+.container{max-width:1200px;margin:auto;}
+.header{
+background:var(--card);padding:24px;border-radius:20px;
+box-shadow:0 10px 30px rgba(0,0,0,.08);margin-bottom:20px;
+}
+.grid{
+display:grid;grid-template-columns:1fr 1fr;gap:20px;
+}
+.card{
+background:var(--card);border-radius:20px;padding:22px;
+box-shadow:0 10px 30px rgba(0,0,0,.08);
+}
+h1,h2,h3{margin-top:0}
+.section-title{color:var(--accent)}
+label{display:block;font-size:.9rem;color:var(--muted);margin-bottom:6px}
+input{
+width:100%;padding:12px;border:1px solid #d1d5db;
+border-radius:10px;font-size:15px;
+}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+button{
+width:100%;padding:14px;border:none;border-radius:12px;
+background:var(--accent);color:white;font-size:16px;font-weight:700;
+cursor:pointer;
+}
+button:hover{opacity:.95}
+.results{
+display:grid;grid-template-columns:repeat(2,1fr);gap:12px;
+}
+.metric{
+background:#f8fafc;padding:14px;border-radius:12px;border-left:5px solid var(--accent);
+}
+.metric .value{font-size:1.2rem;font-weight:700}
+table{width:100%;border-collapse:collapse}
+th,td{padding:10px;border-bottom:1px solid #e5e7eb;text-align:left}
+.footer{margin-top:15px;padding:15px;background:#eef4ff;border-radius:12px}
+@media(max-width:900px){
+.grid,.results,.row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+<h1>💰 Advanced Loan Calculator</h1>
+<p>Configure plan settings, fees, taxes and instantly calculate deposit, repayment and daily installment.</p>
+</div>
+
+<div class="grid">
+
+<div class="card">
+<h2 class="section-title">⚙️ Plan Settings</h2>
+
+<div class="row">
+<div>
+<label>Loan Amount (KES)</label>
+<input id="amount" type="number" placeholder="100000">
+</div>
+<div>
+<label>Duration (Days)</label>
+<input id="days" value="365" type="number">
+</div>
+</div>
+
+<div class="row">
+<div>
+<label>Down Payment (%)</label>
+<input id="down" value="27" type="number" step="0.01">
+</div>
+<div>
+<label>Daily Interest (%)</label>
+<input id="dailyInterest" value="0.30" type="number" step="0.01">
+</div>
+</div>
+
+<h3>Fees & Taxes</h3>
+
+<table>
+<tr><th>Fee</th><th>Rate %</th><th>Basis</th></tr>
+<tr><td>App Fee</td><td><input id="appFee" value="1"></td><td>Principal</td></tr>
+<tr><td>Service Fee</td><td><input id="serviceFee" value="30"></td><td>Principal</td></tr>
+<tr><td>Excise Duty</td><td><input id="excise" value="20"></td><td>Interest</td></tr>
+<tr><td>VAT</td><td><input id="vat" value="16"></td><td>Interest</td></tr>
+</table>
+
+<br>
+<button onclick="calculate()">Calculate Loan</button>
+</div>
+
+<div class="card">
+<h2 class="section-title">📊 Results</h2>
+
+<div class="results">
+<div class="metric"><div>Deposit</div><div class="value" id="deposit">KES 0</div></div>
+<div class="metric"><div>Financed Amount</div><div class="value" id="financed">KES 0</div></div>
+<div class="metric"><div>Interest</div><div class="value" id="interest">KES 0</div></div>
+<div class="metric"><div>Total Fees</div><div class="value" id="fees">KES 0</div></div>
+<div class="metric"><div>Total Repayment</div><div class="value" id="repayment">KES 0</div></div>
+<div class="metric"><div>Daily Payment</div><div class="value" id="daily">KES 0</div></div>
+</div>
+
+<div class="footer" id="breakdown">
+Run a calculation to see the full breakdown.
+</div>
+
+</div>
+
+</div>
+</div>
+
+<script>
+function fmt(n){
+return "KES " + n.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+function calculate(){
+
+const amount=Number(document.getElementById("amount").value||0);
+const days=Number(document.getElementById("days").value||0);
+const down=Number(document.getElementById("down").value)/100;
+const rate=Number(document.getElementById("dailyInterest").value)/100;
+
+const appFeeRate=Number(document.getElementById("appFee").value)/100;
+const serviceFeeRate=Number(document.getElementById("serviceFee").value)/100;
+const exciseRate=Number(document.getElementById("excise").value)/100;
+const vatRate=Number(document.getElementById("vat").value)/100;
+
+const deposit=amount*down;
+const financed=amount-deposit;
+
+const interest=financed*rate*days;
+
+const appFee=financed*appFeeRate;
+const serviceFee=financed*serviceFeeRate;
+const excise=interest*exciseRate;
+const vat=interest*vatRate;
+
+const fees=appFee+serviceFee+excise+vat;
+
+const repayment=financed+interest+fees;
+const daily=days>0 ? repayment/days : 0;
+
+document.getElementById("deposit").innerText=fmt(deposit);
+document.getElementById("financed").innerText=fmt(financed);
+document.getElementById("interest").innerText=fmt(interest);
+document.getElementById("fees").innerText=fmt(fees);
+document.getElementById("repayment").innerText=fmt(repayment);
+document.getElementById("daily").innerText=fmt(daily);
+
+document.getElementById("breakdown").innerHTML=`
+<b>Detailed Breakdown</b><br><br>
+App Fee: ${fmt(appFee)}<br>
+Service Fee: ${fmt(serviceFee)}<br>
+Excise Duty: ${fmt(excise)}<br>
+VAT: ${fmt(vat)}<br>
+<hr>
+Total Charges: <b>${fmt(fees)}</b>
+`;
+}
+</script>
+
+</body>
+</html>
