@@ -270,7 +270,7 @@ function calculate() {
 
 // ─── Setup Event Listeners ───────────────────────────────────────────────────
 function init() {
-  const inputs = document.querySelectorAll('.card input');
+  const inputs = document.querySelectorAll('.card input, .card select');
   inputs.forEach(input => {
     input.addEventListener('input', calculate);
     input.addEventListener('change', calculate);

@@ -431,7 +431,8 @@ input:disabled {
   box-shadow: var(--shadow);
   transform: scale(0.92);
   transition: transform 0.2s ease-in-out;
-  overflow: hidden;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 .modal.show .modal-content {
   transform: scale(1);
