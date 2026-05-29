@@ -60,7 +60,7 @@ function calculate() {
   const appFee    = financed * appFeeRate;
   const serviceFee= financed * serviceFeeRate;
   const excise    = interest * exciseRate;
-  const vat       = interest * vatRate;
+  const vat       = financed * vatRate;
   const fees      = appFee + serviceFee + excise + vat;
 
   const repayment = financed + interest + fees;
