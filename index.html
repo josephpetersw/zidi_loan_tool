@@ -7,7 +7,8 @@
   <title>Advanced Loan Calculator</title>
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css">
+  <!-- Cache-busting query parameter for CSS -->
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
 
@@ -43,8 +44,13 @@
           <label for="days">Duration</label>
           <div class="input-wrap">
             <i class="fa-solid fa-calendar-days input-icon"></i>
-            <input id="days" type="number" value="365" min="1" step="1" oninput="calculate()">
-            <span class="input-suffix">days</span>
+            <select id="days" onchange="calculate()">
+              <option value="365" selected>12 Months (365 days)</option>
+              <option value="273">9 Months (273 days)</option>
+              <option value="182">6 Months (182 days)</option>
+              <option value="60">2 Months (60 days)</option>
+            </select>
+            <i class="fa-solid fa-chevron-down select-arrow"></i>
           </div>
         </div>
       </div>
