@@ -482,6 +482,12 @@ input:disabled {
   font-size: 0.88rem;
   padding: 6px 0;
   border-bottom: 1px dashed var(--border-light);
+  align-items: center;
+}
+.modal-row input[type="checkbox"] {
+  cursor: pointer;
+  accent-color: var(--primary);
+  transform: scale(1.05);
 }
 .modal-row:last-child {
   border-bottom: none;
@@ -492,6 +498,7 @@ input:disabled {
 .modal-row .val {
   font-weight: 700;
   font-variant-numeric: tabular-nums;
+  transition: opacity var(--trans);
 }
 .modal-row.inflow .val {
   color: #10b981; /* Green for inflows */
