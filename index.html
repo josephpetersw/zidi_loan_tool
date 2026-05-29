@@ -19,7 +19,7 @@
 
     <!-- ─── Header ─── -->
     <header class="header">
-      <div class="badge"><i class="fa-solid fa-calculator"></i> KES Loan Planner</div>
+
       <h1>Advanced Loan Calculator</h1>
       <p>Configure plan settings, fees &amp; taxes — instantly compute deposit, repayment and daily installment.</p>
     </header>
@@ -34,7 +34,8 @@
             <i class="fa-solid fa-sliders"></i>
             Plan Settings
           </span>
-          <button onclick="forceReset()" class="btn-reset" title="Force Clean Reset (Clear Cache)" aria-label="Reset app and clear cache">
+          <button onclick="forceReset()" class="btn-reset" title="Force Clean Reset (Clear Cache)"
+            aria-label="Reset app and clear cache">
             <i class="fa-solid fa-arrows-rotate"></i>
           </button>
         </h2>
@@ -138,9 +139,9 @@
               <td class="col-check"><input type="checkbox" id="agentCommEnabled" checked onclick="calculate()"
                   aria-label="Enable Agent Commission"></td>
               <td>Agent Commission</td>
-              <td><input id="agentComm" type="number" value="3000" min="0" step="100" oninput="calculate()"
-                  aria-label="Agent Commission amount"></td>
-              <td><span class="basis-tag">Fixed</span></td>
+              <td><input id="agentComm" type="number" value="100" min="0" step="1" oninput="calculate()"
+                  aria-label="Agent Commission percentage"></td>
+              <td><span class="basis-tag">Down Pymt</span></td>
             </tr>
           </tbody>
         </table>
@@ -192,7 +193,8 @@
           </div>
         </div>
 
-        <button class="btn-profit" onclick="openModal()" id="profitBtn" style="margin-top: 16px; width: 100%; display: none;" aria-label="Open profit breakdown">
+        <button class="btn-profit" onclick="openModal()" id="profitBtn"
+          style="margin-top: 16px; width: 100%; display: none;" aria-label="Open profit breakdown">
           <i class="fa-solid fa-chart-line"></i> View Profit Breakdown
         </button>
       </div>
@@ -204,7 +206,7 @@
   <div id="profitModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3>💰 Profit Analysis Breakdown</h3>
+        <h3><i class="fa-solid fa-chart-pie" style="margin-right:7px"></i>Profit Analysis Breakdown</h3>
         <button class="modal-close" onclick="closeModal()">&times;</button>
       </div>
       <div class="modal-body" id="profitModalBody">

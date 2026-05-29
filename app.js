@@ -9,9 +9,9 @@ let currentAgentComm = 0;
 
 // ─── Format number as KES currency ───────────────────────────────────────────
 function fmt(n) {
-  return 'KES ' + n.toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
+  return 'KES ' + Math.round(n).toLocaleString(undefined, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
   });
 }
 
@@ -56,35 +56,43 @@ window.addEventListener('click', (e) => {
 
 // ─── Update Profit Modal Calculations Dynamically ───────────────────────────
 function updateModalProfit() {
-  const exciseEnabled = document.getElementById('exciseEnabled').checked;
-  const vatEnabled = document.getElementById('vatEnabled').checked;
-  const agentCommEnabled = document.getElementById('agentCommEnabled').checked;
+  const appFeeEnabled     = document.getElementById('appFeeEnabled').checked;
+  const serviceFeeEnabled = document.getElementById('serviceFeeEnabled').checked;
+  const exciseEnabled     = document.getElementById('exciseEnabled').checked;
+  const vatEnabled        = document.getElementById('vatEnabled').checked;
+  const agentCommEnabled  = document.getElementById('agentCommEnabled').checked;
 
   // Retrieve deduction checkbox states in the modal
-  const exciseDeduct = document.getElementById('modalExciseDeduct')?.checked ?? true;
-  const vatDeduct = document.getElementById('modalVatDeduct')?.checked ?? true;
-  const agentCommDeduct = document.getElementById('modalAgentCommDeduct')?.checked ?? true;
+  const appFeeDeduct     = document.getElementById('modalAppFeeDeduct')?.checked ?? true;
+  const serviceFeeDeduct = document.getElementById('modalServiceFeeDeduct')?.checked ?? true;
+  const exciseDeduct     = document.getElementById('modalExciseDeduct')?.checked ?? true;
+  const vatDeduct        = document.getElementById('modalVatDeduct')?.checked ?? true;
+  const agentCommDeduct  = document.getElementById('modalAgentCommDeduct')?.checked ?? true;
 
-  // Revenue = Interest + Application + Service + License fees
+  // Revenue = Interest + all fees collected
   const revenue = currentInterest + currentAppFee + currentServiceFee + currentLicenseFee;
-  
+
   // Deductions: only apply if enabled in settings AND checked in modal
-  const exciseDeduction = (exciseEnabled && exciseDeduct) ? currentExcise : 0;
-  const vatDeduction = (vatEnabled && vatDeduct) ? currentVat : 0;
-  const agentCommDeduction = (agentCommEnabled && agentCommDeduct) ? currentAgentComm : 0;
-  
-  const totalDeductions = exciseDeduction + vatDeduction + agentCommDeduction;
+  const appFeeDeduction     = (appFeeEnabled     && appFeeDeduct)     ? currentAppFee     : 0;
+  const serviceFeeDeduction = (serviceFeeEnabled && serviceFeeDeduct) ? currentServiceFee : 0;
+  const exciseDeduction     = (exciseEnabled     && exciseDeduct)     ? currentExcise     : 0;
+  const vatDeduction        = (vatEnabled        && vatDeduct)        ? currentVat        : 0;
+  const agentCommDeduction  = (agentCommEnabled  && agentCommDeduct)  ? currentAgentComm  : 0;
+
+  const totalDeductions = appFeeDeduction + serviceFeeDeduction + exciseDeduction + vatDeduction + agentCommDeduction;
   const netProfit = revenue - totalDeductions;
 
   // Update DOM values in modal
   document.getElementById('modalTotalDeductionsVal').textContent = fmt(totalDeductions);
   document.getElementById('modalNetProfitVal').textContent = fmt(netProfit);
-  document.getElementById('modalMarginVal').textContent = (revenue > 0 ? ((netProfit / revenue) * 100).toFixed(1) : 0) + '%';
+  document.getElementById('modalMarginVal').textContent = (revenue > 0 ? Math.round((netProfit / revenue) * 100) : 0) + '%';
 
   // Visually fade out values when not deducted
-  document.getElementById('modalExciseVal').style.opacity = (exciseEnabled && exciseDeduct) ? '1' : '0.4';
-  document.getElementById('modalVatVal').style.opacity = (vatEnabled && vatDeduct) ? '1' : '0.4';
-  document.getElementById('modalAgentCommVal').style.opacity = (agentCommEnabled && agentCommDeduct) ? '1' : '0.4';
+  document.getElementById('modalAppFeeVal').style.opacity    = (appFeeEnabled     && appFeeDeduct)     ? '1' : '0.4';
+  document.getElementById('modalServiceFeeVal').style.opacity= (serviceFeeEnabled && serviceFeeDeduct) ? '1' : '0.4';
+  document.getElementById('modalExciseVal').style.opacity    = (exciseEnabled     && exciseDeduct)     ? '1' : '0.4';
+  document.getElementById('modalVatVal').style.opacity       = (vatEnabled        && vatDeduct)        ? '1' : '0.4';
+  document.getElementById('modalAgentCommVal').style.opacity = (agentCommEnabled  && agentCommDeduct)  ? '1' : '0.4';
 }
 
 // ─── Main calculate function ──────────────────────────────────────────────────
@@ -118,22 +126,23 @@ function calculate() {
   vatInput.disabled = !vatEnabled;
   agentCommInput.disabled = !agentCommEnabled;
 
-  // Compute rates
+  // Basic loan calculations (must come before commission which depends on deposit)
+  const deposit   = amount * down;
+  const financed  = amount - deposit;
+  const interest  = financed * rate * days;
+
+  // Compute fee rates
   const appFeeRate    = appFeeEnabled ? (Number(appFeeInput.value) / 100) : 0;
   const serviceFeeRate= serviceFeeEnabled ? (Number(serviceFeeInput.value) / 100) : 0;
   const licenseFeeRate= licenseFeeEnabled ? (Number(licenseFeeInput.value) / 100) : 0;
   const exciseRate    = exciseEnabled ? (Number(exciseInput.value) / 100) : 0;
   const vatRate       = vatEnabled ? (Number(vatInput.value) / 100) : 0;
-  
-  // Flat KES amount
-  const agentComm     = agentCommEnabled ? Number(agentCommInput.value) : 0;
 
-  // Basic loan calculations
-  const deposit   = amount * down;
-  const financed  = amount - deposit;
-  const interest  = financed * rate * days;
+  // Agent Commission = % of Down Payment
+  const agentCommRate = Number(agentCommInput.value) / 100;
+  const agentComm     = agentCommEnabled ? deposit * agentCommRate : 0;
 
-  // Fees & taxes (Rates are based on Financed Principal, Excise is on Interest)
+  // Fees & taxes (Rates based on Financed Principal, Excise on Interest)
   const appFee    = financed * appFeeRate;
   const serviceFee= financed * serviceFeeRate;
   const licenseFee= financed * licenseFeeRate;
@@ -174,7 +183,7 @@ function calculate() {
   bd.classList.add('has-data');
   
   bd.innerHTML = `
-    <div class="breakdown-title">📋 Detailed Breakdown</div>
+    <div class="breakdown-title"><i class="fa-solid fa-list-check" style="margin-right:6px"></i>Detailed Breakdown</div>
     <div class="breakdown-row">
       <span class="br-label">Application Fee ${appFeeEnabled ? `(${(appFeeRate*100).toFixed(0)}%)` : ''}</span>
       <span class="br-value">${appFeeEnabled ? fmt(appFee) : '<span class="disabled-tag">Disabled</span>'}</span>
@@ -196,7 +205,7 @@ function calculate() {
       <span class="br-value">${vatEnabled ? fmt(vat) : '<span class="disabled-tag">Disabled</span>'}</span>
     </div>
     <div class="breakdown-row">
-      <span class="br-label">Agent Commission</span>
+      <span class="br-label">Agent Commission ${agentCommEnabled ? `(${(agentCommRate*100).toFixed(0)}% of Down Pymt)` : ''}</span>
       <span class="br-value">${agentCommEnabled ? fmt(agentComm) : '<span class="disabled-tag">Disabled</span>'}</span>
     </div>
     <div class="breakdown-total">
@@ -206,35 +215,49 @@ function calculate() {
   `;
 
   // Build Profit Modal breakdown content
-  const revenue = interest + appFee + serviceFee + licenseFee;
-  const expenses = excise + vat + agentComm;
-  const netProfit = revenue - expenses;
-  
+  const revenue    = interest + appFee + serviceFee + licenseFee;
+  const expenses   = excise + vat + agentComm;
+  const netProfit  = revenue - expenses;
+
   const profitModalBody = document.getElementById('profitModalBody');
   profitModalBody.innerHTML = `
-    <div class="modal-section-title">📈 Revenue (Inflows)</div>
+
+    <!-- ── Revenue ─────────────────────────────────────── -->
+    <div class="modal-section-title"><i class="fa-solid fa-arrow-trend-up" style="margin-right:6px"></i>Revenue (Inflows)</div>
     <div class="modal-row inflow">
       <span class="label">Interest Income</span>
       <span class="val">+ ${fmt(interest)}</span>
     </div>
-    <div class="modal-row inflow">
-      <span class="label">Application Fee</span>
-      <span class="val">+ ${appFeeEnabled ? fmt(appFee) : 'KES 0.00 (Disabled)'}</span>
+
+    <!-- ── Operational Costs ───────────────────────────── -->
+    <div class="modal-section-title" style="margin-top: 18px;"><i class="fa-solid fa-gears" style="margin-right:6px"></i>Operational Costs</div>
+    <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 8px; font-style: italic;">
+      Uncheck any items that are NOT remitted to count them as profit:
     </div>
-    <div class="modal-row inflow">
-      <span class="label">Service Fee</span>
-      <span class="val">+ ${serviceFeeEnabled ? fmt(serviceFee) : 'KES 0.00 (Disabled)'}</span>
+    <div class="modal-row outflow">
+      <span class="label" style="display: flex; align-items: center; gap: 6px;">
+        ${appFeeEnabled ? `<input type="checkbox" id="modalAppFeeDeduct" checked onclick="updateModalProfit()">` : ''}
+        Application Fee ${appFeeEnabled ? `(${(appFeeRate*100).toFixed(0)}%)` : ''}
+      </span>
+      <span class="val" id="modalAppFeeVal">- ${appFeeEnabled ? fmt(appFee) : 'KES 0 (Disabled)'}</span>
     </div>
-    <div class="modal-row inflow">
-      <span class="label">License Fee</span>
-      <span class="val">+ ${licenseFeeEnabled ? fmt(licenseFee) : 'KES 0.00 (Disabled)'}</span>
-    </div>
-    <div class="modal-row" style="border-top: 1px solid var(--border-light); font-weight: 700; padding-top: 8px; margin-top: 4px;">
-      <span class="label" style="color: var(--text);">Total Revenue</span>
-      <span class="val" style="color: #10b981;">${fmt(revenue)}</span>
+    <div class="modal-row outflow">
+      <span class="label" style="display: flex; align-items: center; gap: 6px;">
+        ${serviceFeeEnabled ? `<input type="checkbox" id="modalServiceFeeDeduct" checked onclick="updateModalProfit()">` : ''}
+        Service Fee ${serviceFeeEnabled ? `(${(serviceFeeRate*100).toFixed(0)}%)` : ''}
+      </span>
+      <span class="val" id="modalServiceFeeVal">- ${serviceFeeEnabled ? fmt(serviceFee) : 'KES 0 (Disabled)'}</span>
     </div>
 
-    <div class="modal-section-title" style="margin-top: 18px;">💸 Expenses & Taxes (Outflows)</div>
+    <!-- ── Obligations ─────────────────────────────────── -->
+    <div class="modal-section-title" style="margin-top: 18px;"><i class="fa-solid fa-file-contract" style="margin-right:6px"></i>Obligations</div>
+    <div class="modal-row outflow">
+      <span class="label">License Fee ${licenseFeeEnabled ? `(${(licenseFeeRate*100).toFixed(0)}%)` : ''}</span>
+      <span class="val">- ${licenseFeeEnabled ? fmt(licenseFee) : 'KES 0 (Disabled)'}</span>
+    </div>
+
+    <!-- ── Expenses & Taxes ────────────────────────────── -->
+    <div class="modal-section-title" style="margin-top: 18px;"><i class="fa-solid fa-arrow-trend-down" style="margin-right:6px"></i>Expenses &amp; Taxes (Outflows)</div>
     <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 8px; font-style: italic;">
       Uncheck any items that are NOT remitted to count them as profit:
     </div>
@@ -243,34 +266,39 @@ function calculate() {
         ${exciseEnabled ? `<input type="checkbox" id="modalExciseDeduct" checked onclick="updateModalProfit()">` : ''}
         Excise Duty (Tax)
       </span>
-      <span class="val" id="modalExciseVal">- ${exciseEnabled ? fmt(excise) : 'KES 0.00 (Disabled)'}</span>
+      <span class="val" id="modalExciseVal">- ${exciseEnabled ? fmt(excise) : 'KES 0 (Disabled)'}</span>
     </div>
     <div class="modal-row outflow">
       <span class="label" style="display: flex; align-items: center; gap: 6px;">
         ${vatEnabled ? `<input type="checkbox" id="modalVatDeduct" checked onclick="updateModalProfit()">` : ''}
         VAT (Tax)
       </span>
-      <span class="val" id="modalVatVal">- ${vatEnabled ? fmt(vat) : 'KES 0.00 (Disabled)'}</span>
+      <span class="val" id="modalVatVal">- ${vatEnabled ? fmt(vat) : 'KES 0 (Disabled)'}</span>
     </div>
     <div class="modal-row outflow">
       <span class="label" style="display: flex; align-items: center; gap: 6px;">
         ${agentCommEnabled ? `<input type="checkbox" id="modalAgentCommDeduct" checked onclick="updateModalProfit()">` : ''}
-        Agent Commission
+        Agent Commission ${agentCommEnabled ? `(${(agentCommRate*100).toFixed(0)}% of Down Pymt)` : ''}
       </span>
-      <span class="val" id="modalAgentCommVal">- ${agentCommEnabled ? fmt(agentComm) : 'KES 0.00 (Disabled)'}</span>
+      <span class="val" id="modalAgentCommVal">- ${agentCommEnabled ? fmt(agentComm) : 'KES 0 (Disabled)'}</span>
     </div>
     <div class="modal-row" style="border-top: 1px solid var(--border-light); font-weight: 700; padding-top: 8px; margin-top: 4px;">
+      <span class="label" style="color: var(--text);">Total Revenue</span>
+      <span class="val" id="modalTotalRevenueVal" style="color: #10b981;">${fmt(revenue)}</span>
+    </div>
+    <div class="modal-row" style="font-weight: 700; padding-top: 4px;">
       <span class="label" style="color: var(--text);">Total Deductions</span>
       <span class="val" id="modalTotalDeductionsVal" style="color: #ef4444;">${fmt(expenses)}</span>
     </div>
 
+    <!-- ── Net Profit ──────────────────────────────────── -->
     <div class="modal-profit-summary" style="margin-top: 20px; padding-top: 15px; border-top: 1.5px solid var(--border-color);">
       <div class="profit-value-large">
         <span style="color: var(--text);">Net Profit Remaining</span>
         <span id="modalNetProfitVal" style="color: var(--primary); font-size: 1.3rem;">${fmt(netProfit)}</span>
       </div>
       <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 6px; text-align: right;">
-        Profit margin: <b id="modalMarginVal">${revenue > 0 ? ((netProfit / revenue) * 100).toFixed(1) : 0}%</b>
+        Profit margin: <b id="modalMarginVal">${revenue > 0 ? Math.round((netProfit / revenue) * 100) : 0}%</b>
       </div>
     </div>
   `;
