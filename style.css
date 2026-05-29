@@ -543,6 +543,31 @@ input:disabled {
   border-color: var(--primary);
 }
 
+/* ─── reset button ─── */
+.btn-reset {
+  background: none;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: color var(--trans), border-color var(--trans), background var(--trans), transform 0.3s ease;
+  outline: none;
+}
+.btn-reset:hover {
+  color: var(--primary);
+  border-color: var(--primary);
+  background: var(--highlight-bg);
+}
+.btn-reset:active {
+  transform: rotate(180deg);
+}
+
 /* ─── responsive ─── */
 @media (max-width: 860px) {
   .grid          { grid-template-columns: 1fr; }

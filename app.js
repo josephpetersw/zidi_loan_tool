@@ -38,6 +38,14 @@ function closeModal() {
   document.getElementById('profitModal').classList.remove('show');
 }
 
+function forceReset() {
+  // Clear local and session storage
+  localStorage.clear();
+  sessionStorage.clear();
+  // Force cache-busting reload by appending/replacing a timestamp query param
+  window.location.href = window.location.origin + window.location.pathname + '?t=' + Date.now();
+}
+
 // Close modal if clicking outside the modal content box
 window.addEventListener('click', (e) => {
   const modal = document.getElementById('profitModal');

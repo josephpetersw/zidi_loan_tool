@@ -29,9 +29,14 @@
 
       <!-- ════ Left card: Settings ════ -->
       <div class="card">
-        <h2 class="section-title">
-          <i class="fa-solid fa-sliders"></i>
-          Plan Settings
+        <h2 class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="display: flex; align-items: center; gap: 10px;">
+            <i class="fa-solid fa-sliders"></i>
+            Plan Settings
+          </span>
+          <button onclick="forceReset()" class="btn-reset" title="Force Clean Reset (Clear Cache)" aria-label="Reset app and clear cache">
+            <i class="fa-solid fa-arrows-rotate"></i>
+          </button>
         </h2>
 
         <div class="form-row">
