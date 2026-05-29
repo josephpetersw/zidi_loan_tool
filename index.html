@@ -129,6 +129,14 @@
                   aria-label="VAT percentage"></td>
               <td><span class="basis-tag">Principal</span></td>
             </tr>
+            <tr>
+              <td class="col-check"><input type="checkbox" id="agentCommEnabled" checked onclick="calculate()"
+                  aria-label="Enable Agent Commission"></td>
+              <td>Agent Commission</td>
+              <td><input id="agentComm" type="number" value="3000" min="0" step="100" oninput="calculate()"
+                  aria-label="Agent Commission amount"></td>
+              <td><span class="basis-tag">Fixed</span></td>
+            </tr>
           </tbody>
         </table>
 

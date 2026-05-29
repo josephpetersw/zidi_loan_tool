@@ -33,6 +33,7 @@ function calculate() {
   const licenseFeeEnabled = document.getElementById('licenseFeeEnabled').checked;
   const exciseEnabled = document.getElementById('exciseEnabled').checked;
   const vatEnabled = document.getElementById('vatEnabled').checked;
+  const agentCommEnabled = document.getElementById('agentCommEnabled').checked;
 
   // Get inputs
   const appFeeInput = document.getElementById('appFee');
@@ -40,6 +41,7 @@ function calculate() {
   const licenseFeeInput = document.getElementById('licenseFee');
   const exciseInput = document.getElementById('excise');
   const vatInput = document.getElementById('vat');
+  const agentCommInput = document.getElementById('agentComm');
 
   // Sync disabled attribute with checkboxes
   appFeeInput.disabled = !appFeeEnabled;
@@ -47,6 +49,7 @@ function calculate() {
   licenseFeeInput.disabled = !licenseFeeEnabled;
   exciseInput.disabled = !exciseEnabled;
   vatInput.disabled = !vatEnabled;
+  agentCommInput.disabled = !agentCommEnabled;
 
   // Compute rates
   const appFeeRate    = appFeeEnabled ? (Number(appFeeInput.value) / 100) : 0;
@@ -54,19 +57,22 @@ function calculate() {
   const licenseFeeRate= licenseFeeEnabled ? (Number(licenseFeeInput.value) / 100) : 0;
   const exciseRate    = exciseEnabled ? (Number(exciseInput.value) / 100) : 0;
   const vatRate       = vatEnabled ? (Number(vatInput.value) / 100) : 0;
+  
+  // Flat KES amount
+  const agentComm     = agentCommEnabled ? Number(agentCommInput.value) : 0;
 
   // Basic loan calculations
   const deposit   = amount * down;
   const financed  = amount - deposit;
   const interest  = financed * rate * days;
 
-  // Fees & taxes (All based on Financed Principal)
+  // Fees & taxes (Rates are based on Financed Principal)
   const appFee    = financed * appFeeRate;
   const serviceFee= financed * serviceFeeRate;
   const licenseFee= financed * licenseFeeRate;
   const excise    = financed * exciseRate;
   const vat       = financed * vatRate;
-  const fees      = appFee + serviceFee + licenseFee + excise + vat;
+  const fees      = appFee + serviceFee + licenseFee + excise + vat + agentComm;
 
   const repayment = financed + interest + fees;
   const daily     = days > 0 ? repayment / days : 0;
@@ -104,6 +110,10 @@ function calculate() {
     <div class="breakdown-row">
       <span class="br-label">VAT ${vatEnabled ? `(${(vatRate*100).toFixed(0)}%)` : ''}</span>
       <span class="br-value">${vatEnabled ? fmt(vat) : '<span class="disabled-tag">Disabled</span>'}</span>
+    </div>
+    <div class="breakdown-row">
+      <span class="br-label">Agent Commission</span>
+      <span class="br-value">${agentCommEnabled ? fmt(agentComm) : '<span class="disabled-tag">Disabled</span>'}</span>
     </div>
     <div class="breakdown-total">
       <span class="br-label">Total Charges</span>
